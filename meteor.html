@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meteor</title>
+    <style>
+        body,
+        html {
+            background-color: #000;
+            color: #fff;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0
+        }
+
+        #moon {
+            position: absolute;
+            top: 20vh;
+            left: 20vh;
+            width: 20vh;
+            border-radius: 100%;
+            animation: moon-shining 3s alternate infinite;
+            z-index: 1;
+        }
+
+        @keyframes moon-shining {
+            from {
+                box-shadow: 0 0px 40px 40px rgba(255, 255, 255, 0.15);
+            }
+
+            to {
+                box-shadow: 0 0px 40px 40px rgba(255, 255, 255, 0.2);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <img src="img/moon.png" alt="" id="moon">
+    <canvas id="bgCanvas"></canvas>
+    <canvas id="terCanvas"></canvas>
+    
+    <script>
+        (function () {
+            var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                window.webkitRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+            window.requestAnimationFrame = requestAnimationFrame;
+        })();
+
+        // Sky
+        var sky = document.getElementById("bgCanvas"),
+            skyCtx = sky.getContext("2d"),
+            width = window.innerWidth,
+            height = document.body.offsetHeight;
+        (height < 400) ? height = 400 : height;
+        sky.width = width;
+        sky.height = height;
+
+
+        // Stars
+        function Star(options) {
+            this.size = Math.random() * 2;
+            this.speed = Math.random() * .1;
+            this.x = options.x;
+            this.y = options.y;
+        }
+
+        Star.prototype.reset = function () {
+            this.size = Math.random() * 2;
+            this.speed = Math.random() * .1;
+            this.x = width;
+            this.y = Math.random() * height;
+        }
+
+        Star.prototype.update = function () {
+            this.x += this.speed;
+            if (this.x < 0) {
+                this.reset();
+            } else {
+                skyCtx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        // Meteor
+
+        function Meteor() {
+            this.reset();
+        }
+
+        Meteor.prototype.reset = function () {
+            this.x = Math.random() * width;
+            this.y = 0;
+            this.len = (Math.random() * 80) + 10;
+            this.speed = (Math.random() * 10) + 6;
+            this.size = (Math.random() * 1) + 0.1;
+            // this is used so the shooting stars arent constant
+            this.waitTime = new Date().getTime() + (Math.random() * 3000) + 500;
+            this.active = false;
+        }
+
+        Meteor.prototype.update = function () {
+            if (this.active) {
+                this.x += this.speed;
+                this.y += this.speed;
+                if (this.x < 0 || this.y >= height) {
+                    this.reset();
+                } else {
+                    skyCtx.lineWidth = this.size;
+                    skyCtx.beginPath();
+                    skyCtx.moveTo(this.x, this.y);
+                    skyCtx.lineTo(this.x + this.len, this.y + this.len);
+                    skyCtx.stroke();
+                }
+            } else {
+                if (this.waitTime < new Date().getTime()) {
+                    this.active = true;
+                }
+            }
+        }
+
+        var entities = [];
+
+        // init the stars
+        for (var i = 0; i < height; i++) {
+            entities.push(new Star({ x: Math.random() * width, y: Math.random() * height }));
+        }
+
+        // Add 2 shooting stars that just cycle.
+        entities.push(new Meteor());
+        entities.push(new Meteor());
+
+        //animate background
+        function animate() {
+            skyCtx.fillStyle = 'rgb(9,52,101)';
+            skyCtx.fillRect(0, 0, width, height);
+            skyCtx.fillStyle = '#ffffff';
+            skyCtx.strokeStyle = '#ffffff';
+
+            var entLen = entities.length;
+
+            while (entLen--) {
+                entities[entLen].update();
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+
+    </script>
+</body>
+
+</html>

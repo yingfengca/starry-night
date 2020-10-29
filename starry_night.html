@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starry Night</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        header nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        header nav ul li {
+            line-height: 50px;
+            padding: 0 10px;
+            font-size: 20px;
+
+        }
+
+        header nav ul li:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+
+        }
+
+        header nav ul li a {
+            padding: 20px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        header nav ul li a:hover {
+            color: black;
+        }
+
+        #cover {
+            height: calc(100vh - 50px);
+        }
+
+        #cover main {
+            height: calc(100vh - 50px);
+        }
+
+        #cover footer {
+            height: 100px;
+            background-color: #fff;
+        }
+
+        #sky_canvas {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: -1;
+        }
+
+        #moon {
+            background-image: url(img/moon.png);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: fixed;
+            top: 30vh;
+            left: 20vh;
+            width: 200px;
+            height: 200px;
+            border-radius: 100%;
+            animation: moon-shining 2s alternate infinite;
+            z-index: 0;
+        }
+
+        @keyframes moon-shining {
+            from {
+                box-shadow: 0 0px 40px 40px rgba(255, 255, 255, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0px 50px 50px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        #clouds {
+            width: 100%;
+            z-index: 2;
+        }
+
+        #clouds1 {
+            position: absolute;
+            bottom: 0;
+            height: 106px;
+            width: 100%;
+            background-image: url(img/clouds1.png);
+            background-repeat: repeat;
+            animation: move_right 1000s linear infinite;
+        }
+
+        #clouds2 {
+            position: absolute;
+            bottom: 20px;
+            height: 132px;
+            width: 100%;
+            background-image: url(img/clouds2.png);
+        }
+
+        #clouds3 {
+            position: absolute;
+            bottom: 40px;
+            height: 132px;
+            width: 100%;
+            background-image: url(img/clouds3.png);
+            animation: move_left 1000s linear infinite;
+
+        }
+
+
+
+        @keyframes move_right {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: 1000vw 0;
+            }
+        }
+
+        @keyframes move_left {
+            from {
+                background-position: 1000vw 0;
+            }
+
+            to {
+                background-position: 0 0;
+            }
+        }
+
+
+        #welcome{
+            /* visibility: hidden; */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+        #welcome .close{
+            color: white;
+            font-size: 50px;
+            position: absolute;
+            top:100px;
+            right: 100px;
+            cursor: pointer;
+        }
+
+        
+
+        #welcome #msg_box{
+            width: 300px;
+            height: 150px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 2px 2px 3px 3px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #music_control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        #disc {
+            background-image: url(vinyl.png);
+            background-size: cover;
+            width: 50px;
+            height: 50px;
+            animation: rotate 3s linear infinite;
+        }
+
+        #disc:hover {
+            cursor: pointer;
+        }
+
+        @keyframes rotate {
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+        #intro{
+            position: relative;
+            height: 100vh;
+            z-index: 2;
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="starry_night.html">Home</a></li>
+                <li><a href="cloud.html">Cloud</a></li>
+                <li><a href="meteor.html">Meteor</a></li>
+                <li><a href="moon.html">Moon</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div id="welcome">
+        <!-- <span class="close">&times;</span> -->
+        <div id="msg_box">
+                Welcome to my website!
+        </div>
+    </div>
+    <div id="cover">     
+        <div id="music_control">
+            <div id="disc"></div>
+        </div>
+        <main>
+            <canvas id="sky_canvas"></canvas>
+            <div id="moon"></div>
+            <div id="clouds">
+                <div id="clouds3"></div>
+                <div id="clouds2"></div>
+                <div id="clouds1"></div>
+            </div>
+            
+        </main>
+    </div>
+    <div id="intro">
+
+    </div>
+
+    <script>
+        const bg_music = new Audio("Night Snow - Asher Fulero.mp3")
+        bg_music.loop=true;
+        const disc = document.querySelector("#disc")
+        const welcome = document.querySelector("#welcome")
+        const msgbox = document.querySelector("#msg_box")
+        const moon=document.querySelector("#moon")
+        let music_playing = false
+        disc.onclick = (event) => {
+            if (music_playing) {
+                musicPause()
+            } else {
+                musicPlay()
+            }
+        }
+        welcome.onclick=(event)=>{
+            closeModal()
+        }
+        msgbox.onclick=(event)=>{
+            closeModal()
+        }
+
+        document.onscroll=()=>{
+            console.log(moon.offsetTop);
+        }
+
+        function closeModal(){
+            welcome.style.visibility="hidden";
+            musicPlay();
+        }
+
+        function musicPause() {
+            bg_music.pause();
+            disc.style.animationPlayState = "paused";
+            music_playing = false
+        }
+
+        function musicPlay() {
+            bg_music.play()
+            disc.style.animationPlayState = "running";
+            music_playing = true
+        }
+
+    </script>
+
+    <script>
+
+        (function () {
+            var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                window.webkitRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+            window.requestAnimationFrame = requestAnimationFrame;
+        })();
+
+        // Sky
+        var sky = document.getElementById("sky_canvas"),
+            skyCtx = sky.getContext("2d"),
+            width = window.innerWidth,
+            height = window.innerHeight;
+        (height < 400) ? height = 400 : height;
+        sky.width = width;
+        sky.height = height;
+
+
+        // Stars
+        function Star(options) {
+            this.size = Math.random() * 2;
+            this.speed = Math.random() * .1;
+            this.x = options.x;
+            this.y = options.y;
+        }
+
+        Star.prototype.reset = function () {
+            this.size = Math.random() * 2;
+            this.speed = Math.random() * .1;
+            this.x = width;
+            this.y = Math.random() * height;
+        }
+
+        Star.prototype.update = function () {
+            this.x += this.speed;
+            if (this.x < 0) {
+                this.reset();
+            } else {
+                skyCtx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
+
+        // Meteor
+
+        function Meteor() {
+            this.reset();
+        }
+
+        Meteor.prototype.reset = function () {
+            this.x = Math.random() * width;
+            this.y = 0;
+            this.len = (Math.random() * 80) + 10;
+            this.speed = (Math.random() * 10) + 6;
+            this.size = (Math.random() * 1) + 0.1;
+            // this is used so the shooting stars arent constant
+            this.waitTime = new Date().getTime() + (Math.random() * 3000) + 500;
+            this.active = false;
+        }
+
+        Meteor.prototype.update = function () {
+            if (this.active) {
+                this.x += this.speed;
+                this.y += this.speed;
+                if (this.x < 0 || this.y >= height) {
+                    this.reset();
+                } else {
+                    skyCtx.lineWidth = this.size;
+                    skyCtx.beginPath();
+                    skyCtx.moveTo(this.x, this.y);
+                    skyCtx.lineTo(this.x + this.len, this.y + this.len);
+                    skyCtx.stroke();
+                }
+            } else {
+                if (this.waitTime < new Date().getTime()) {
+                    this.active = true;
+                }
+            }
+        }
+
+        var entities = [];
+
+        // init the stars
+        for (var i = 0; i < height; i++) {
+            entities.push(new Star({ x: Math.random() * width, y: Math.random() * height }));
+        }
+
+        // Add 2 shooting stars that just cycle.
+        entities.push(new Meteor());
+        entities.push(new Meteor());
+
+        //animate background
+        function animate() {
+            var lingrad = skyCtx.createLinearGradient(0, 0, 0, height);
+            lingrad.addColorStop(0, '#17123d');
+            lingrad.addColorStop(1, '#094B89');
+            skyCtx.fillStyle = lingrad;
+
+            skyCtx.fillRect(0, 0, width, height);
+            skyCtx.fillStyle = '#ffffff';
+            skyCtx.strokeStyle = '#ffffff';
+
+            var entLen = entities.length;
+
+            while (entLen--) {
+                entities[entLen].update();
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+
+    </script>
+</body>
+
+</html>
